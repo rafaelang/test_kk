@@ -1,0 +1,123 @@
+version: '3.8'
+
+services:
+  # 1. MongoDB Service
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongouser
+      MONGO_INITDB_ROOT_PASSWORD: mongopass
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+
+  # 2. Mongo Express Service (Web UI)
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    restart: always
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_MONGODB_ADMINUSERNAME: mongouser
+      ME_CONFIG_MONGODB_ADMINPASSWORD: mongopass
+      ME_CONFIG_BASICAUTH_USERNAME: ${ME_CONFIG_BASICAUTH_USERNAME:-mexpress_user}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${ME_CONFIG_BASICAUTH_PASSWORD:-mexpress_pass}
+      ME_CONFIG_MONGODB_URL: mongodb://mongouser:mongopass@mongodb:27017/
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongodb
+
+  # 3. PostgreSQL Service (Relational Database) 🐘
+  product_db:
+    image: postgres:15-alpine
+    container_name: product_db
+    restart: always
+    environment:
+      # Required environment variables for PostgreSQL initialization
+      POSTGRES_USER: product_db_user
+      POSTGRES_PASSWORD: product_db_password
+      POSTGRES_DB: product_db
+    volumes:
+      # Persist PostgreSQL data
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      # Map container port 5432 to host port 5432
+      - "5432:5432"
+
+  # 4. Redis Service (In-Memory Data Structure Store/Cache) 💾
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: always
+    volumes:
+      # Optional: Persist Redis data (RDB snapshots/AOF)
+      - redis-data:/data
+    ports:
+      # Map container port 6379 to host port 6379
+      - "6379:6379"
+
+  # 5. Kafka Service (KRaft Mode - Apache Official Image) ⚙️
+  kafka:
+    image: apache/kafka:latest
+    container_name: kafka
+    restart: always
+    user: root # Necessário para permissões de formatação no KRaft
+    environment:
+      # ... other environment variables remain the same ...
+      
+      # *** KEY CHANGE: Ensuring internal clients use the service name ***
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka:9092,EXTERNAL://localhost:9094" 
+      
+      # Map listeners to security protocols
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT"
+      
+      # The internal listener must be recognized as the inter-broker listener
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+      # Required for KRaft mode
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
+      KAFKA_LISTENERS: "INTERNAL://kafka:9092,EXTERNAL://0.0.0.0:9094,CONTROLLER://kafka:9093"
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+      # Enable auto topic creation
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      
+    volumes:
+      # KRaft requer persistência para metadados
+      - kafka-data:/tmp/kraft-storage
+    ports:
+      # Porta 9094 é a porta EXTERNA para clientes NestJS
+      - "9094:9094"
+      - "9092:9092"
+
+  # 6. Kafdrop Service (Kafka Web UI) 💻
+  kafdrop:
+    image: obsidiandynamics/kafdrop:latest
+    container_name: kafdrop
+    restart: always
+    environment:
+      # Conecta o Kafdrop ao Kafka usando o nome do serviço Docker 'kafka' e a porta interna 9092
+      KAFKA_BROKERCONNECT: kafka:9092
+    ports:
+      # Mapeia a interface web do Kafdrop para a porta 9000 do host
+      - "9000:9000"
+    depends_on:
+      - kafka
+
+# Define the persistent volumes for all services
+volumes:
+  mongo-data:
+    driver: local
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  kafka-data:
+    driver: local
