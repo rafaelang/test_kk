@@ -21,4 +21,10 @@ export class CartService {
         // Lógica para limpar o carrinho de compras pelo ID
         return { cartId, cartCleared: true };
     }
+
+    updateCart(cartId: string, item: { productId: string; quantity: number }) {
+        // Lógica para atualizar o carrinho de compras pelo ID
+        console.log(`Updating cart ${cartId} with item`, item);
+        return { cartId, itemUpdated: item };
+    }
 }
