@@ -3,6 +3,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CartDao, CartProductDao } from './daos/cart.dao';
 import { CartDto, ProductOperationDto } from './dtos/cart.dto';
 import { ProductDto } from './dtos/product.dto';
+import { CartProduct } from './cart.entity';
 
 @Injectable()
 export class CartService {
@@ -37,11 +38,14 @@ export class CartService {
         return cartDto;
     }
 
-
+    async getCartProduct(shoppingCartId: number, productId: number): Promise<CartProduct | null> {
+        const cartProduct = await this.cartProductRepository.get(shoppingCartId, productId);
+        return cartProduct;
+    }
+    
     async addItemToCart(shoppingCartId: number, item: ProductOperationDto) {
         const product = await this.getProduct(item.productId);
         item.price = product.price;
-        this.logger.log(`Adding item to cart ${shoppingCartId}:`, item, product);
         const cartProduct = await this.cartProductRepository.updateOrCreate(
             shoppingCartId,
             item.productId,
@@ -51,20 +55,28 @@ export class CartService {
         return { shoppingCartId, itemAdded: cartProduct };
     }
 
-    removeItemFromCart(shoppingCartId: number, itemId: number) {
-        this.logger.log(`Removing item ${itemId} from cart ${shoppingCartId}`);
-        // Lógica para remover um item do carrinho de compras pelo ID
-        return { shoppingCartId, itemRemoved: itemId };
-    }
-    
-    clearCart(shoppingCartId: number) {
-        // Lógica para limpar o carrinho de compras pelo ID
-        return { shoppingCartId, cartCleared: true };
+    async removeItemFromCart(shoppingCartId: number, item: ProductOperationDto) {
+        const cartProduct = await this.getCartProduct(shoppingCartId, item.productId);
+        let new_quantity = 0;
+
+        if (!cartProduct) {
+            throw new Error(`Product with ID ${item.productId} not found in cart ${shoppingCartId}`);
+        }
+        if (cartProduct.quantity <= item.quantity) {
+            this.cartProductRepository.delete(cartProduct);
+        }
+        if (cartProduct.quantity > item.quantity) {
+            cartProduct.quantity -= item.quantity;
+            new_quantity = cartProduct.quantity;
+            await this.cartProductRepository.save(cartProduct);
+        }
+        
+        return { shoppingCartId, itemRemoved: item.productId, currentQuantity: new_quantity };
     }
 
     async updateCart(shoppingCartId: number, item: ProductOperationDto) {
         if (item.operation === 'REMOVE') {
-            return this.removeItemFromCart(shoppingCartId, item.productId);
+            return this.removeItemFromCart(shoppingCartId, item);
         } else if (item.operation === 'ADD') {
             return this.addItemToCart(shoppingCartId, item);
         }

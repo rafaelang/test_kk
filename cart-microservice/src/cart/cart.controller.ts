@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { CartService } from './cart.service';
-import { MessagePattern } from '@nestjs/microservices';
+import { MessagePattern, RpcException } from '@nestjs/microservices';
 import { ProductOperationDto } from './dtos/cart.dto';
 import { UsePipes, ValidationPipe, Body } from '@nestjs/common';
 
@@ -11,12 +11,16 @@ export class CartController {
     @Get(':userId')
     async getCart(@Param('userId') userId: number) {
         //await new Promise(resolve => setTimeout(resolve, 2000));
-        //TODO: calcular os totais
         return this.cartService.getCartByUserId(userId);
     }
 
     @MessagePattern('update_cart')
     async updateCart(@Body() data: { shoppingCartId: number; item: ProductOperationDto }) {
-        return this.cartService.updateCart(data.shoppingCartId, data.item);
+        try {
+            return await this.cartService.updateCart(data.shoppingCartId, data.item);
+        } catch (error) {
+            // thrown exceptions and send them to the reply topic
+            throw new RpcException(error.message || 'Failed to update cart');
+        }
     }
 }

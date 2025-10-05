@@ -28,6 +28,20 @@ export class CartService {
     }
 
     async addItem(shoppingCartId: string, item: CartOperationDto) {
+        if (item.operation !== 'ADD') {
+            throw new Error(`Invalid operation for addItem: ${item.operation}`);
+        }
+        return this.updateItem(shoppingCartId, item);
+    }
+
+    async removeItem(shoppingCartId: string, item: CartOperationDto) {
+        if (item.operation !== 'REMOVE') {
+            throw new Error(`Invalid operation for removeItem: ${item.operation}`);
+        }
+        return this.updateItem(shoppingCartId, item);
+    }
+
+    async updateItem(shoppingCartId: string, item: CartOperationDto) {
         const responseObservable = this.brokerService.send(this.topicCartUpdate, { shoppingCartId, item });
         const response = await firstValueFrom(responseObservable);
         return response.data;

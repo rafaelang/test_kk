@@ -1,4 +1,3 @@
-import { ASTAndDefiniteProgram } from './../../node_modules/@typescript-eslint/typescript-estree/dist/create-program/shared.d';
 import { Controller, Get, Param, Post, Body } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CartOperationDto, CartOperationType, CartRequestOperationDto } from './dtos/cart-operation.dto';
@@ -20,10 +19,17 @@ export class CartController {
         }
     }
 
-    @Post(':cartId/add-item')
+    @Post(':shoppingCartId/add-item')
     @ApiBody({ type: CartRequestOperationDto })
-    async addItem(@Param('cartId') cartId: string, @Body() item: CartRequestOperationDto) {
+    async addItem(@Param('shoppingCartId') shoppingCartId: string, @Body() item: CartRequestOperationDto) {
         const payload: CartOperationDto = { operation: CartOperationType.ADD, productId: item.productId, quantity: item.quantity };
-        return await this.cartService.addItem(cartId, payload);
+        return await this.cartService.addItem(shoppingCartId, payload);
+    }
+
+    @Post(':shoppingCartId/remove-item')
+    @ApiBody({ type: CartRequestOperationDto })
+    async removeItem(@Param('shoppingCartId') shoppingCartId: string, @Body() item: CartRequestOperationDto) {
+        const payload: CartOperationDto = { operation: CartOperationType.REMOVE, productId: item.productId, quantity: item.quantity };
+        return await this.cartService.removeItem(shoppingCartId, payload);
     }
 }

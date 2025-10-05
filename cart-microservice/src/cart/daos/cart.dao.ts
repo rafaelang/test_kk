@@ -39,7 +39,25 @@ export class CartProductDao {
         private readonly repository: Repository<CartProduct>,
     ) {}
 
-    async updateOrCreate(cartId: number, productId: number, item: ProductDto, fn_assign: CallableFunction = Object.assign): Promise<CartProduct> {
+    async get(shoppingCartId: number, productId: number): Promise<CartProduct | null> {
+        let cart_product = await this.repository.findOneBy({ productId: productId, cart: { shoppingCartId: shoppingCartId } });
+        return cart_product;
+    }
+
+    async delete(cartProduct: CartProduct): Promise<void> {
+        await this.repository.remove(cartProduct);
+    }
+
+    async save(cartProduct: CartProduct): Promise<CartProduct> {
+        return this.repository.save(cartProduct);
+    }
+
+    async updateOrCreate(
+        cartId: number,
+        productId: number,
+        item: ProductDto,
+        fn_assign: (target: CartProduct, source: ProductDto) => void = Object.assign
+    ): Promise<CartProduct> {
         let [created, cart_product] = await this.getOrCreate(cartId, productId, item, false);
 
         if (!created) {
@@ -49,7 +67,7 @@ export class CartProductDao {
         cart_product.productId = productId;
         cart_product = await this.repository.save(cart_product);
 
-        return cart_product
+        return cart_product;
     }
 
     async getOrCreate(
