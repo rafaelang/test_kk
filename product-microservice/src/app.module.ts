@@ -1,28 +1,21 @@
 import { Module } from '@nestjs/common';
 import { ProductController } from './product/product.controller';
 import { ProductModule } from './product/product.module';
-import { TypeOrmModule } from '@nestjs/typeorm/dist/typeorm.module';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { ConfigService } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose/dist/mongoose.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRootAsync({
+    MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('DB_HOST') || 'localhost',
-        port: configService.get<number>('DB_PORT') || 5432,
-        username: configService.get('DB_USERNAME') || 'postgres',
-        password: configService.get('DB_PASSWORD') || 'postgres',
-        database: configService.get('DB_DATABASE') || 'postgres',
-        entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-        synchronize: false,
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGODB_URI'),
       }),
+      inject: [ConfigService],
     }),
     ProductModule],
   controllers: [ProductController],

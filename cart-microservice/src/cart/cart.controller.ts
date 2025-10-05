@@ -7,7 +7,7 @@ export class CartController {
     
     @Get(':cartId')
     async getCart(@Param('cartId') cartId: string) {
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        //await new Promise(resolve => setTimeout(resolve, 2000));
         return this.cartService.getCartById(cartId);
     }
 }
