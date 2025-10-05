@@ -5,10 +5,10 @@ import { CartService } from './cart.service';
 import { HttpService } from '@nestjs/axios/dist/http.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { HttpModule } from '@nestjs/axios/dist/http.module';
+import axios from 'axios';
 
 @Module({
   imports: [
-    HttpModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -38,15 +38,15 @@ import { HttpModule } from '@nestjs/axios/dist/http.module';
   providers: [
     {
       provide: 'CART_HTTP_CLIENT',
-      useFactory: (httpService: HttpService, configService: ConfigService) => {
-        const axiosInstance = httpService.axiosRef;
-        axiosInstance.defaults.timeout = 500;
-        axiosInstance.defaults.baseURL =
-          configService.get<string>('CART_API_URL');
-        axiosInstance.defaults.maxRedirects = 5;
+      useFactory: (configService: ConfigService) => {
+        const axiosInstance = axios.create({
+          timeout: 500,
+          maxRedirects: 5,
+        });
+        axiosInstance.defaults.baseURL = configService.get<string>('CART_API_URL');
         return axiosInstance;
       },
-      inject: [HttpService, ConfigService],
+      inject: [ConfigService],
     },
     CartService,
     ConfigService,

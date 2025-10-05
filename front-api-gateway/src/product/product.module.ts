@@ -2,20 +2,21 @@ import { HttpModule, HttpService } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ProductService } from './product.service';
+import axios from 'axios';
 
 @Module({
-    imports: [HttpModule],
     providers: [
         {
             provide: "PRODUCT_HTTP_CLIENT",
-            useFactory: (httpService: HttpService, configService: ConfigService) => {
-                const axiosInstance = httpService.axiosRef;
-                axiosInstance.defaults.timeout = 5000;
+            useFactory: (configService: ConfigService) => {
+                const axiosInstance = axios.create({
+                    timeout: 5000,
+                    maxRedirects: 5,
+                });
                 axiosInstance.defaults.baseURL = configService.get<string>('PRODUCT_API_URL');
-                axiosInstance.defaults.maxRedirects = 5;
                 return axiosInstance;
             },
-            inject: [HttpService, ConfigService],
+            inject: [ConfigService],
         },
         ProductService,
         ConfigService

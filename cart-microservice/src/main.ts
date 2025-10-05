@@ -54,7 +54,8 @@ async function bootstrapRestApi() {
 }
 
 async function bootstrap() {
-  await bootstrapBroker();
+  //await 
+  bootstrapBroker();
   await bootstrapRestApi();
 }
 

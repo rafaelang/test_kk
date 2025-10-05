@@ -2,17 +2,11 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'ty
 
 @Entity('cart')
 export class Cart {
-    @PrimaryGeneratedColumn('uuid')
-    shoppingCartId: string;
+    @PrimaryGeneratedColumn()
+    shoppingCartId: number;
 
-    @Column({ type: 'varchar', length: 50 })
-    userId: string;
-
-    @Column({ type: 'float' })
-    totalPrice: number;
-
-    @Column({ type: 'int' })
-    totalQuantity: number;
+    @Column({ type: 'int', nullable: true })
+    userId: number;
 
     @OneToMany(() => CartProduct, product => product.cart, { cascade: true, eager: true })
     products: CartProduct[];
@@ -20,20 +14,17 @@ export class Cart {
 
 @Entity('cart_product')
 export class CartProduct {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
-    @Column({ type: 'varchar', length: 50 })
-    productId: string;
+    @Column({ type: 'int'})
+    productId: number;
 
     @Column({ type: 'float' })
     price: number;
 
     @Column({ type: 'int' })
     quantity: number;
-
-    @Column({ type: 'uuid' })
-    cartId: string;
 
     @ManyToOne(() => Cart, cart => cart.products)
     cart: Cart;

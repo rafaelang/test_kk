@@ -28,6 +28,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.0",
     "axios": "^1.12.2",
+    "class-validator": "^0.14.2",
     "dotenv": "^17.2.3",
     "kafkajs": "^2.2.4",
     "reflect-metadata": "^0.2.2",

@@ -11,7 +11,7 @@ export class ProductService {
     ) { }
 
     async getProducts() {
-        const response = await this.httpService.get('/product/list');
+        const response = await this.httpService.get('/products');
         return response.data;
     }
 }

@@ -8,6 +8,14 @@ import { Model } from 'mongoose';
 export class ProductService {
     constructor(@InjectModel(Product.name) private productModel: Model<Product>) {}
 
+    async findByProductId(productId: number): Promise<Product | null> {
+        return this.productModel.findOne({ productId }).exec();
+    }
+
+    async findOne(productId: string): Promise<Product | null> {
+        return this.productModel.findById(productId).exec();
+    }
+
     async findAll(): Promise<Product[]> {
         return this.productModel.find().exec();
     }

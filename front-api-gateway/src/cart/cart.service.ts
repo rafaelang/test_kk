@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices/client/client-kafka';
 import { firstValueFrom } from 'rxjs';
+import { CartOperationDto } from './dtos/cart-operation.dto';
 
 @Injectable()
 export class CartService {
@@ -21,13 +22,13 @@ export class CartService {
         await this.brokerService.connect();
     }
 
-    async getCart(cartId: string) {
-        const response = await this.httpService.get(`/cart/${cartId}`);
+    async getCartByUserId(userId: string) {
+        const response = await this.httpService.get(`/cart/${userId}`);
         return response.data;
     }
 
-    async addItem(cartId: string, item: { productId: string; quantity: number }) {
-        const responseObservable = this.brokerService.send(this.topicCartUpdate, { cartId, item });
+    async addItem(shoppingCartId: string, item: CartOperationDto) {
+        const responseObservable = this.brokerService.send(this.topicCartUpdate, { shoppingCartId, item });
         const response = await firstValueFrom(responseObservable);
         return response.data;
     }

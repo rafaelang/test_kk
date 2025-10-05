@@ -1,30 +1,76 @@
-import { Injectable } from '@nestjs/common';
+import { firstValueFrom } from 'rxjs';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { CartDao, CartProductDao } from './daos/cart.dao';
+import { CartDto, ProductOperationDto } from './dtos/cart.dto';
+import { ProductDto } from './dtos/product.dto';
 
 @Injectable()
 export class CartService {
-    getCartById(cartId: string) {
-        // Lógica para obter o carrinho de compras pelo ID
-        return { cartId, items: [] };
+    private readonly logger = new Logger(CartService.name);
+
+    constructor(
+        private readonly cartRepository: CartDao,
+        private readonly cartProductRepository: CartProductDao,
+        @Inject("PRODUCT_HTTP_CLIENT")
+        private readonly productService: any,
+    ) {}
+
+    async getProduct(productId: number): Promise<ProductDto> {
+        const response = await this.productService.get(`/products/${productId}`);
+        return response.data;
     }
 
-    addItemToCart(cartId: string, item: any) {
-        // Lógica para adicionar um item ao carrinho de compras pelo ID
-        return { cartId, itemAdded: item };
+    async getCartById(shoppingCartId: number) {
+        const cart = await this.cartRepository.get(shoppingCartId);
+        return cart;
     }
 
-    removeItemFromCart(cartId: string, itemId: string) {
+    async getCartByUserId(userId: number): Promise<CartDto> {
+        let cart = await this.cartRepository.getOrCreateByUserId(userId);
+        const calculatedTotal = cart.products.reduce((sum, product) => sum + product.price * product.quantity, 0);
+        const totalQuantity = cart.products.reduce((sum, product) => sum + product.quantity, 0);
+        const cartDto = { 
+            ...cart,
+            totalPrice: calculatedTotal,
+            totalQuantity: totalQuantity
+        };
+        return cartDto;
+    }
+
+
+    async addItemToCart(shoppingCartId: number, item: ProductOperationDto) {
+        const product = await this.getProduct(item.productId);
+        item.price = product.price;
+        this.logger.log(`Adding item to cart ${shoppingCartId}:`, item, product);
+        const cartProduct = await this.cartProductRepository.updateOrCreate(
+            shoppingCartId,
+            item.productId,
+            item,
+            (target, source) => { target.quantity += source.quantity }
+        );
+        return { shoppingCartId, itemAdded: cartProduct };
+    }
+
+    removeItemFromCart(shoppingCartId: number, itemId: number) {
+        this.logger.log(`Removing item ${itemId} from cart ${shoppingCartId}`);
         // Lógica para remover um item do carrinho de compras pelo ID
-        return { cartId, itemRemoved: itemId };
+        return { shoppingCartId, itemRemoved: itemId };
     }
-
-    clearCart(cartId: string) {
+    
+    clearCart(shoppingCartId: number) {
         // Lógica para limpar o carrinho de compras pelo ID
-        return { cartId, cartCleared: true };
+        return { shoppingCartId, cartCleared: true };
     }
 
-    updateCart(cartId: string, item: { productId: string; quantity: number }) {
-        // Lógica para atualizar o carrinho de compras pelo ID
-        console.log(`Updating cart ${cartId} with item`, item);
-        return { cartId, itemUpdated: item };
+    async updateCart(shoppingCartId: number, item: ProductOperationDto) {
+        if (item.operation === 'REMOVE') {
+            return this.removeItemFromCart(shoppingCartId, item.productId);
+        } else if (item.operation === 'ADD') {
+            return this.addItemToCart(shoppingCartId, item);
+        }
+        const cartProduct = await this.cartProductRepository.getOrCreate(shoppingCartId, item.productId, item);
+
+        this.logger.log(`Updating cart ${shoppingCartId} with item`, item);
+        return { shoppingCartId, itemUpdated: item };
     }
 }

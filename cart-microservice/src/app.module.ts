@@ -21,6 +21,7 @@ import { CartController } from './cart/cart.controller';
         database: configService.get('DB_DATABASE') || 'postgres',
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
         synchronize: false,
+        logging: true,
       }),
     }),
     CartModule

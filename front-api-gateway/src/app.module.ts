@@ -13,10 +13,10 @@ import { HttpService } from '@nestjs/axios';
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    CartModule,
     ProductModule,
-    CartModule
   ],
-  controllers: [ProductController, CartController],
+  controllers: [CartController, ProductController],
   providers: [CartService, ProductService],
 })
 export class AppModule {}
