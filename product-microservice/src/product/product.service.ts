@@ -10,7 +10,6 @@ export class ProductService {
     constructor(@InjectModel(Product.name) private productModel: Model<Product>) {}
 
     async findByProductId(productId: number): Promise<Product | null> {
-        console.log('Finding product by productId:', productId);
         return await this.productModel.findOne({ productId }).exec();
     }
 

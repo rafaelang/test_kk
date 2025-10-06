@@ -1,8 +1,9 @@
 import { Controller, Get, Param, Post, Body } from '@nestjs/common';
 import { CartService } from './cart.service';
-import { CartOperationDto, CartOperationType, CartRequestOperationDto, GetCartIdParamDto, GetCartUserIdParamDto } from './dtos/cart-operation.dto';
+import { CartDto, CartOperationDto, CartOperationType, CartRequestOperationDto, GetCartIdParamDto, GetCartUserIdParamDto } from './dtos/cart-operation.dto';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { BadRequestException } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('cart')
 export class CartController {
@@ -10,11 +11,12 @@ export class CartController {
 
     @Get(':userId')
     @ApiOperation({ summary: 'Get user cart details' })
-    @ApiResponse({ status: 200, description: 'User cart details returned successfully.' })
+    @ApiResponse({ status: 200, description: 'User cart details returned successfully.', type: CartDto })
     @ApiParam({ name: 'userId', required: true, description: 'ID of the user' })
-    async getCart(@Param() params: GetCartUserIdParamDto) {
+    async getCart(@Param() params: GetCartUserIdParamDto): Promise<CartDto> {
         try {
-            return await this.cartService.getCartByUserId(params.userId);
+            const payload = await this.cartService.getCartByUserId(params.userId);
+            return plainToInstance(CartDto, payload);
         } catch (error) {
             if (error.isAxiosError) {
                 throw new Error(`Axios error: ${error.message}`);

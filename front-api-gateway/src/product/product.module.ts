@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ProductService } from './product.service';
 import axios from 'axios';
+import { ProductDto } from './dtos/produc.dto';
 
 @Module({
   providers: [

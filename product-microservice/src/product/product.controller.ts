@@ -10,7 +10,7 @@ export class ProductController {
 
   @Get()
   @ApiOperation({ summary: 'Get all products' })
-  @ApiResponse({ status: 200, description: 'List of products', type: [PaginatedProductsDto] })
+  @ApiResponse({ status: 200, description: 'List of products', type: PaginatedProductsDto })
   async findAll(@Query() query: PaginationParamsDto): Promise<PaginatedProductsDto> {
     return this.productService.findAll(query.limit || 10, query.offset || 0);
   }
