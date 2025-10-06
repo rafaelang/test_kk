@@ -1,34 +1,43 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToOne,
+} from 'typeorm';
 
 @Entity('cart')
 export class Cart {
-    @PrimaryGeneratedColumn()
-    shoppingCartId: number;
+  @PrimaryGeneratedColumn()
+  shoppingCartId: number;
 
-    @Column({ type: 'int', nullable: true })
-    userId: number;
+  @Column({ type: 'int', nullable: true })
+  userId: number;
 
-    @OneToMany(() => CartProduct, product => product.cart, { cascade: true, eager: true })
-    products: CartProduct[];
+  @OneToMany(() => CartProduct, (product) => product.cart, {
+    cascade: true,
+    eager: true,
+  })
+  products: CartProduct[];
 }
 
 @Entity('cart_product')
 export class CartProduct {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ type: 'int'})
-    productId: number;
+  @Column({ type: 'int' })
+  productId: number;
 
-    @Column({ type: 'float' })
-    price: number;
+  @Column({ type: 'float' })
+  price: number;
 
-    @Column({ type: 'int' })
-    quantity: number;
+  @Column({ type: 'int' })
+  quantity: number;
 
-    @Column({ type: 'int' })
-    userId: number;
+  @Column({ type: 'int' })
+  userId: number;
 
-    @ManyToOne(() => Cart, cart => cart.products)
-    cart: Cart;
+  @ManyToOne(() => Cart, (cart) => cart.products)
+  cart: Cart;
 }

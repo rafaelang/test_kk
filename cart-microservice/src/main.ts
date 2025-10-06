@@ -6,13 +6,17 @@ import { SwaggerModule } from '@nestjs/swagger/dist/swagger-module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common/pipes/validation.pipe';
 
-
 async function bootstrapBroker() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
-  const brokers = configService.get<string>('KAFKA_BROKERS', 'localhost:9094').split(',');
-  const groupId = configService.get<string>('KAFKA_GROUP_ID', 'cart-service-group');
+  const brokers = configService
+    .get<string>('KAFKA_BROKERS', 'localhost:9094')
+    .split(',');
+  const groupId = configService.get<string>(
+    'KAFKA_GROUP_ID',
+    'cart-service-group',
+  );
 
   const kafkaApp = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
@@ -31,7 +35,7 @@ async function bootstrapBroker() {
           allowAutoTopicCreation: true,
         },
       },
-    }
+    },
   );
   await kafkaApp.listen();
 }
@@ -49,7 +53,7 @@ async function bootstrapRestApi() {
   SwaggerModule.setup('docs', app, document);
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
-  
+
   const configService = app.get(ConfigService);
   const port = configService.get<number>('CART_API_PORT', 3002);
 
@@ -57,7 +61,7 @@ async function bootstrapRestApi() {
 }
 
 async function bootstrap() {
-  //await 
+  //await
   bootstrapBroker();
   await bootstrapRestApi();
 }

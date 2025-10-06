@@ -24,7 +24,7 @@ import { CartController } from './cart/cart.controller';
         logging: true,
       }),
     }),
-    CartModule
+    CartModule,
   ],
   controllers: [CartController],
   providers: [],

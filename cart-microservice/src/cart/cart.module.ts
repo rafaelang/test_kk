@@ -19,14 +19,15 @@ import axios from 'axios';
   ],
   providers: [
     {
-      provide: "PRODUCT_HTTP_CLIENT",
+      provide: 'PRODUCT_HTTP_CLIENT',
       useFactory: (configService: ConfigService) => {
-          const axiosInstance = axios.create({
-              timeout: 5000,
-              maxRedirects: 5,
-          });
-          axiosInstance.defaults.baseURL = configService.get<string>('PRODUCT_API_URL');
-          return axiosInstance;
+        const axiosInstance = axios.create({
+          timeout: 5000,
+          maxRedirects: 5,
+        });
+        axiosInstance.defaults.baseURL =
+          configService.get<string>('PRODUCT_API_URL');
+        return axiosInstance;
       },
       inject: [ConfigService],
     },
