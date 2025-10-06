@@ -21,10 +21,16 @@ import axios from 'axios';
           options: {
             client: {
               brokers: [configService.get<string>('CART_KAFKA_BROKERS', '')],
-              clientId: configService.get<string>('CART_BROKER_CLIENT_ID', 'cart-service'),
+              clientId: configService.get<string>(
+                'CART_BROKER_CLIENT_ID',
+                'cart-service',
+              ),
             },
             consumer: {
-              groupId: configService.get<string>('CART_BROKER_CONSUMER_GROUP', 'cart-service-group'),
+              groupId: configService.get<string>(
+                'CART_BROKER_CONSUMER_GROUP',
+                'cart-service-group',
+              ),
             },
             producer: {
               allowAutoTopicCreation: true,
@@ -43,7 +49,8 @@ import axios from 'axios';
           timeout: 500,
           maxRedirects: 5,
         });
-        axiosInstance.defaults.baseURL = configService.get<string>('CART_API_URL');
+        axiosInstance.defaults.baseURL =
+          configService.get<string>('CART_API_URL');
         return axiosInstance;
       },
       inject: [ConfigService],

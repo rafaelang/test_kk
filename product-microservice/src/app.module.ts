@@ -17,7 +17,8 @@ import { MongooseModule } from '@nestjs/mongoose/dist/mongoose.module';
       }),
       inject: [ConfigService],
     }),
-    ProductModule],
+    ProductModule,
+  ],
   controllers: [ProductController],
   providers: [],
 })

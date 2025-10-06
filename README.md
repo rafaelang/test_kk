@@ -60,3 +60,39 @@ O projeto adota o padrão de Data Transfer Objects (DTOs) para definir e validar
 
 - [ ] Autenticação
 - [ ] Testes
+
+# Desenvolvimento
+
+## Project Cart Microservice
+
+
+```sh
+git clone git@github.com:rafaelang/<repo>.git
+cd <project>
+cd cart-microservice
+nvm use
+npm install
+echo "DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=product_db_user
+DB_PASSWORD=product_db_password
+DB_DATABASE=product_db
+CART_API_PORT=3002
+KAFKA_BROKERS=localhost:9094
+KAFKA_GROUP_ID=cart-service-group
+PRODUCT_API_URL=http://localhost:3001" > .env
+npm run start:dev
+```
+
+## Project Product Microservice
+
+```sh
+git clone git@github.com:rafaelang/<repo>.git
+cd <project>
+cd product-microservice
+nvm use
+npm install
+echo "MONGODB_URI=mongodb://mongouser:mongopass@localhost:27017/product_microservice?authSource=admin
+PRODUCT_API_PORT=3001" > .env
+npm run start:dev
+```

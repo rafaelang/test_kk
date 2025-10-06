@@ -7,30 +7,32 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class ProductService {
-    constructor(@InjectModel(Product.name) private productModel: Model<Product>) {}
+  constructor(
+    @InjectModel(Product.name) private productModel: Model<Product>,
+  ) {}
 
-    async findByProductId(productId: number): Promise<Product | null> {
-        return await this.productModel.findOne({ productId }).exec();
-    }
+  async findByProductId(productId: number): Promise<Product | null> {
+    return await this.productModel.findOne({ productId }).exec();
+  }
 
-    async findById(id: string): Promise<Product | null> {
-        return this.productModel.findById(id).exec();
-    }
+  async findById(id: string): Promise<Product | null> {
+    return this.productModel.findById(id).exec();
+  }
 
-    async findAll(limit=10, offset=0): Promise<any> {
-        const [results, total] = await Promise.all([
-            this.productModel.find().skip(offset).limit(limit).exec(),
-            this.productModel.countDocuments().exec(),
-        ]);
-        return {
-            results: results,
-            total,
-            totalPages: Math.ceil(total / limit),
-        };
-    }
+  async findAll(limit = 10, offset = 0): Promise<any> {
+    const [results, total] = await Promise.all([
+      this.productModel.find().skip(offset).limit(limit).exec(),
+      this.productModel.countDocuments().exec(),
+    ]);
+    return {
+      results: results,
+      total,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
 
-    async createOrUpdate(data: ProductDto): Promise<Product> {
-        const createdProduct = new this.productModel(data);
-        return createdProduct.save();
-    }
+  async createOrUpdate(data: ProductDto): Promise<Product> {
+    const createdProduct = new this.productModel(data);
+    return createdProduct.save();
+  }
 }
