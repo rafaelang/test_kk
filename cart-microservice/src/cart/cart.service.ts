@@ -65,7 +65,9 @@ export class CartService {
         let new_quantity = 0;
 
         if (!cartProduct) {
-            throw new Error(`Product with ID ${item.productId} not found in cart ${shoppingCartId}`);
+            const error = new Error(`Product ${item.productId} does not exist in cart ${shoppingCartId} or cart not found.`);
+            error.name = "InvalidShoppingCartIdError";
+            throw error;
         }
         if (cartProduct.quantity <= item.quantity) {
             this.cartProductRepository.delete(cartProduct);

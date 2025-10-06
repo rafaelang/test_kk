@@ -22,7 +22,6 @@ export class CartController {
         try {
             return await this.cartService.updateCart(data.shoppingCartId, data.item);
         } catch (error) {
-            // thrown exceptions and send them to the reply topic
             throw new RpcException({
                 message: error.message || 'Failed to update cart',
                 exception_type: error.name || 'UnknownException',

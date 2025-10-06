@@ -51,7 +51,7 @@ export class CartController {
             return await this.cartService.removeItem(params.shoppingCartId, payload);
         } catch (error) {
             if (error.exception_type === 'InvalidShoppingCartIdError') {
-                throw new BadRequestException(`ShoppingCartId is invalid: ${params.shoppingCartId}`);
+                throw new BadRequestException(`ShoppingCartId is invalid: ${error.message}`);
             }
             throw error;
         }
