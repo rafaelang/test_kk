@@ -63,15 +63,26 @@ O projeto adota o padrão de Data Transfer Objects (DTOs) para definir e validar
 
 # Desenvolvimento
 
-## Containers para desenvolvimento
+### MongoDB
 
-Antes de iniciar os projetos inicie todos os containers.
+O serviço MongoDB é utilizado pelo projeto Cart Microservice, com usuário e senha mongouser e mongopass respectivamente. Os dados são salvos em um volume persistente e o banco fica disponível na porta padrão 27017.
 
-```sh
-git clone git@github.com:rafaelang/<repo>.git
-cd desenvolvimento_containers
-docker compose up
-```
+### Mongo Express
+
+O serviço Mongo Express oferece uma interface web para gerenciar o banco MongoDB de forma simples e intuitiva. Ele roda na porta 8081 e permite visualizar, editar e excluir documentos, além de executar consultas diretamente pelo navegador. O acesso é protegido por autenticação básica, com usuário e senha mexpress_user e mexpress_pass respectivamente.
+
+### PostgreSQL
+
+O serviço PostgreSQL utiliza a imagem oficial `postgres:15-alpine` e é configurado com usuário, senha e banco de dados específicos para o projeto Product Microservice. Os dados são persistidos em um volume dedicado e o banco está acessível pela porta padrão 5432.
+
+### Redis Service
+
+O serviço Redis é utilizado como armazenamento em memória e cache, proporcionando alta performance para operações rápidas e temporárias. Ele roda na porta 6379, garantindo maior confiabilidade em cenários de reinicialização. Ideal para cache de dados frequentemente acessados.
+
+### Kafdrop Service (Kafka Web UI)
+
+O serviço Kafdrop utiliza a imagem oficial `obsidiandynamics/kafdrop:latest` e oferece uma interface web para visualizar e gerenciar tópicos, mensagens e consumidores do Kafka. Ele conecta-se ao broker Kafka pelo endereço interno `kafka:9092` e expõe a interface web na porta 9000 do host. O Kafdrop facilita o monitoramento e depuração das operações do Kafka no ambiente de desenvolvimento.
+
 
 ## Project Cart Microservice
 
