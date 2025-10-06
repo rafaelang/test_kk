@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config/dist/config.service';
 import { DocumentBuilder } from '@nestjs/swagger/dist/document-builder';
 import { SwaggerModule } from '@nestjs/swagger/dist/swagger-module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { ValidationPipe } from '@nestjs/common/pipes/validation.pipe';
 
 
 async function bootstrapBroker() {
@@ -46,6 +47,8 @@ async function bootstrapRestApi() {
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, document);
+
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   
   const configService = app.get(ConfigService);
   const port = configService.get<number>('CART_API_PORT', 3002);

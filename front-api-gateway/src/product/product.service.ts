@@ -10,8 +10,13 @@ export class ProductService {
         private readonly httpService: any,
     ) { }
 
-    async getProducts() {
-        const response = await this.httpService.get('/products');
+    async getProducts(limit: number = 10, offset: number = 0): Promise<any> {
+        const response = await this.httpService.get('/products', {
+            params: {
+                limit,
+                offset
+            }
+        });
         return response.data;
     }
 }

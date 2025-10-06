@@ -1,7 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsDecimal, IsInt, IsOptional } from 'class-validator';
-
+import { ApiProperty } from "@nestjs/swagger";
+import { IsOptional } from "class-validator";
+import { IsDecimal, IsInt } from "class-validator";
+import { Type } from "class-transformer";
 
 export class ProductDto {
     @ApiProperty({
@@ -14,29 +14,11 @@ export class ProductDto {
 
     @ApiProperty({
         description: 'The price of the product.',
-        example: '19.99',
-    })
-    @Type(() => String)
-    @IsDecimal({ decimal_digits: '2', force_decimal: true })
-    price: string;
-}
-
-export class ProductIdParamDto {
-    @ApiProperty({
-        description: 'The unique identifier of the product.',
-        example: '123',
+        example: 19.99,
     })
     @Type(() => Number)
-    productId: number;
-}
-
-export class ProductObjectIdParamDto {
-    @ApiProperty({
-        description: 'The MongoDB ObjectId of the product.',
-        example: '507f1f77bcf86cd799439011',
-    })
-    @Type(() => String)
-    id: string;
+    @IsDecimal({ decimal_digits: '2', force_decimal: true })
+    price: number;
 }
 
 export class PaginationParamsDto {

@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Cart, CartProduct } from "../cart.entity";
-import { Repository } from "typeorm";
+import { Repository, QueryFailedError } from "typeorm";
 import { CartDto, ProductDto } from "../dtos/cart.dto";
 
 @Injectable()
@@ -37,6 +37,9 @@ export class CartProductDao {
     constructor(
         @InjectRepository(CartProduct)
         private readonly repository: Repository<CartProduct>,
+
+        @InjectRepository(Cart)
+        private readonly cartRepository: Repository<Cart>,
     ) {}
 
     async get(shoppingCartId: number, productId: number): Promise<CartProduct | null> {
@@ -49,7 +52,23 @@ export class CartProductDao {
     }
 
     async save(cartProduct: CartProduct): Promise<CartProduct> {
-        return this.repository.save(cartProduct);
+        try {
+            return await this.repository.save(cartProduct);
+        } catch (error) {
+            if (!(error instanceof QueryFailedError)) {
+                throw error;
+            }
+
+            if (
+                error.driverError.detail.includes(`Key (cartShoppingCartId)=(${cartProduct.cart.shoppingCartId}) is not present in table`)
+            ) {
+               const error = new Error(`Invalid shoppingCartId: ${cartProduct.cart.shoppingCartId} does not exist.`);
+               error.name = "InvalidShoppingCartIdError";
+               throw error;
+            }
+
+            throw error;
+        }
     }
 
     async updateOrCreate(
@@ -65,7 +84,7 @@ export class CartProductDao {
         }
 
         cart_product.productId = productId;
-        cart_product = await this.repository.save(cart_product);
+        cart_product = await this.save(cart_product);
 
         return cart_product;
     }
@@ -87,7 +106,7 @@ export class CartProductDao {
         cart_product.productId = productId;
 
         if (persist) {
-            cart_product = await this.repository.save(cart_product);
+            cart_product = await this.save(cart_product);
         }
 
         return [created, cart_product];

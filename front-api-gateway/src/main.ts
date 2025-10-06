@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder } from '@nestjs/swagger/dist/document-builder';
 import { SwaggerModule } from '@nestjs/swagger/dist/swagger-module';
 import { ConfigService } from '@nestjs/config';
+import { ValidationPipe } from '@nestjs/common/pipes/validation.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,6 +19,8 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document);
   const configService = app.get(ConfigService);
   const port = configService.get<number>('FRONT_API_PORT', 3000);
+
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   await app.listen(port);
 }

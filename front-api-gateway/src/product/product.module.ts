@@ -5,22 +5,23 @@ import { ProductService } from './product.service';
 import axios from 'axios';
 
 @Module({
-    providers: [
-        {
-            provide: "PRODUCT_HTTP_CLIENT",
-            useFactory: (configService: ConfigService) => {
-                const axiosInstance = axios.create({
-                    timeout: 5000,
-                    maxRedirects: 5,
-                });
-                axiosInstance.defaults.baseURL = configService.get<string>('PRODUCT_API_URL');
-                return axiosInstance;
-            },
-            inject: [ConfigService],
-        },
-        ProductService,
-        ConfigService
-    ],
-    exports: [ProductService, "PRODUCT_HTTP_CLIENT"],
+  providers: [
+    {
+      provide: 'PRODUCT_HTTP_CLIENT',
+      useFactory: (configService: ConfigService) => {
+        const axiosInstance = axios.create({
+          timeout: 5000,
+          maxRedirects: 5,
+        });
+        axiosInstance.defaults.baseURL =
+          configService.get<string>('PRODUCT_API_URL');
+        return axiosInstance;
+      },
+      inject: [ConfigService],
+    },
+    ProductService,
+    ConfigService,
+  ],
+  exports: [ProductService, 'PRODUCT_HTTP_CLIENT'],
 })
 export class ProductModule {}

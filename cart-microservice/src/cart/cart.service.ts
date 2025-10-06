@@ -17,8 +17,13 @@ export class CartService {
     ) {}
 
     async getProduct(productId: number): Promise<ProductDto> {
-        const response = await this.productService.get(`/products/${productId}`);
-        return response.data;
+        try {
+            const response = await this.productService.get(`/products/${productId}`);
+            return response.data;
+        } catch (error) {
+            this.logger.error(`Failed to get product with ID ${productId}`, error.stack);
+            throw error;
+        }
     }
 
     async getCartById(shoppingCartId: number) {
@@ -80,7 +85,6 @@ export class CartService {
         } else if (item.operation === 'ADD') {
             return this.addItemToCart(shoppingCartId, item);
         }
-        const cartProduct = await this.cartProductRepository.getOrCreate(shoppingCartId, item.productId, item);
 
         this.logger.log(`Updating cart ${shoppingCartId} with item`, item);
         return { shoppingCartId, itemUpdated: item };

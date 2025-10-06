@@ -22,26 +22,26 @@ export class CartService {
         await this.brokerService.connect();
     }
 
-    async getCartByUserId(userId: string) {
+    async getCartByUserId(userId: number) {
         const response = await this.httpService.get(`/cart/${userId}`);
         return response.data;
     }
 
-    async addItem(shoppingCartId: string, item: CartOperationDto) {
+    async addItem(shoppingCartId: number, item: CartOperationDto) {
         if (item.operation !== 'ADD') {
             throw new Error(`Invalid operation for addItem: ${item.operation}`);
         }
         return this.updateItem(shoppingCartId, item);
     }
 
-    async removeItem(shoppingCartId: string, item: CartOperationDto) {
+    async removeItem(shoppingCartId: number, item: CartOperationDto) {
         if (item.operation !== 'REMOVE') {
             throw new Error(`Invalid operation for removeItem: ${item.operation}`);
         }
         return this.updateItem(shoppingCartId, item);
     }
 
-    async updateItem(shoppingCartId: string, item: CartOperationDto) {
+    async updateItem(shoppingCartId: number, item: CartOperationDto) {
         const responseObservable = this.brokerService.send(this.topicCartUpdate, { shoppingCartId, item });
         const response = await firstValueFrom(responseObservable);
         return response.data;

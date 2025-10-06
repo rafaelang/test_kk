@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export enum CartOperationType {
@@ -33,4 +34,26 @@ export class CartOperationDto {
     @IsInt()
     @Min(1)
     quantity: number;
+}
+
+export class GetCartIdParamDto {
+    @ApiProperty({
+        description: 'The unique identifier of the shopping cart.',
+        example: '11333',
+        required: true,
+    })
+    @IsInt()
+    @Type(() => Number)
+    shoppingCartId: number;
+}
+
+export class GetCartUserIdParamDto {
+    @ApiProperty({
+        description: 'The unique identifier of the user.',
+        example: '5678',
+        required: true,
+    })
+    @IsInt()
+    @Type(() => Number)
+    userId: number;
 }

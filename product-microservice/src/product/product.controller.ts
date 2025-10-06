@@ -1,21 +1,40 @@
-import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Patch, Query } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { ProductDto } from './dtos/product.dto';
-import { ApiBody } from '@nestjs/swagger';
+import { PaginatedProductsDto, PaginationParamsDto, ProductDto, ProductIdParamDto, ProductObjectIdParamDto } from './dtos/product.dto';
+import { ApiBody, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { Product } from './schemas/product.schema';
 
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
-  async findAll() {
-    //await new Promise(resolve => setTimeout(resolve, 2000));
-    return this.productService.findAll();
+  @ApiOperation({ summary: 'Get all products' })
+  @ApiResponse({ status: 200, description: 'List of products', type: [PaginatedProductsDto] })
+  async findAll(@Query() query: PaginationParamsDto): Promise<PaginatedProductsDto> {
+    return this.productService.findAll(query.limit || 10, query.offset || 0);
+  }
+
+  //@Get(':id')
+  @ApiOperation({ summary: 'Get product by id' })
+  @ApiResponse({ status: 200, description: 'The product', type: ProductDto })
+  async findOne(@Param() params: ProductObjectIdParamDto): Promise<Product | null> {
+    const product = await this.productService.findById(params.id);
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    return product;
   }
 
   @Get(':productId')
-  async findOne(@Param('productId') productId: string) {
-    return await this.productService.findByProductId(+productId);
+  @ApiOperation({ summary: 'Get product by id' })
+  @ApiResponse({ status: 200, description: 'The product', type: ProductDto })
+  async findOneByProductId(@Param() params: ProductIdParamDto): Promise<Product | null> {
+    const product = await this.productService.findByProductId(params.productId);
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    return product;
   }
 
   @Patch('patch')
