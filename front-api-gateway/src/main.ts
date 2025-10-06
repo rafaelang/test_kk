@@ -12,7 +12,18 @@ async function bootstrap() {
     .setTitle('API Gateway')
     .setDescription('The API Gateway Front Services')
     .setVersion('1.0')
-    .addTag('api-gateway')
+    .addTag('Front API Gateway')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'access-token',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
 

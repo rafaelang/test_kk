@@ -56,10 +56,6 @@ O projeto adota o padrão de Data Transfer Objects (DTOs) para definir e validar
 | NPX       | 10.9.3    |
 | NPM       | 11.6.1    |
 
-# TODOs
-
-- [ ] Autenticação
-- [ ] Testes
 
 # Desenvolvimento
 
@@ -84,8 +80,32 @@ O serviço Redis é utilizado como armazenamento em memória e cache, proporcion
 O serviço Kafdrop utiliza a imagem oficial `obsidiandynamics/kafdrop:latest` e oferece uma interface web para visualizar e gerenciar tópicos, mensagens e consumidores do Kafka. Ele conecta-se ao broker Kafka pelo endereço interno `kafka:9092` e expõe a interface web na porta 9000 do host. O Kafdrop facilita o monitoramento e depuração das operações do Kafka no ambiente de desenvolvimento.
 
 
-## Project Cart Microservice
+# Projetos
 
+## Autenticação
+
+Acesse [Front API Gateway - Autenticação](http://localhost:3000/docs#/authentication/AuthController_login), utilize o usuário e senha do exemplo, copie o valor do `refresh_token`, clique em `Authorize` e cole o token.
+
+## Solução de problemas
+
+> **ℹ️ (QA) Para cadastro de produtos no ambiente de desenvolvimento:**  
+> No Swagger do Product Microservice há um endpoint de cadastro disponível para criar novos produtos facilmente.
+> Testes usaram fixtures e/ou mocks
+
+#### bootstrap error 
+- UNKNOWN_TOPIC_OR_PARTITION
+A primeir inicialização os tópicos são criados, basta reiniciar a aplicação.
+
+## Documentação Swagger
+
+- [Cart Microservice - Swagger Docs](http://localhost:3002/docs)
+- [Product Microservice - Swagger Docs](http://localhost:3001/docs/)
+- [Front API Gateway - Swagger Docs](http://localhost:3000/docs)
+
+
+# Setup
+
+## Project Cart Microservice
 
 ```sh
 git clone git@github.com:rafaelang/<repo>.git
@@ -132,6 +152,35 @@ PRODUCT_API_URL=http://localhost:3001
 CART_API_URL=http://localhost:3002
 CART_KAFKA_BROKERS=localhost:9094
 CART_BROKER_CONSUMER_GROUP=apigatewaycart-service-group
-CART_BROKER_CLIENT_ID=apigateway-cart-service" > .env
+CART_BROKER_CLIENT_ID=apigateway-cart-service
+JWT_SECRET=7b4e9f3a1d6c8b2f5a0e3d2c1b4a9f3e7c6d8b0a5f2e1d4c7b9a2e8d3f6c1b4e9f3a1d6c8b2f5a0e3d2c1b4a9f3e7c6d8b0a5f2e1d4c7b9a2e8d3f6c1b4e
+JWT_EXPIRATION_TIME=1h" > .env
 npm run start:dev
 ```
+
+# Fluxo do Carriho
+
+## Get Cart
+
+> **ℹ️ Usuário e carrinho ativo** 
+> Como usuário esta fora do escopo, o get cria um carrinho para um idUser novo enviado, e recupera o carrinho atual caso exista o id.
+> Assim como não há checkout para conclusão do carrinho ou tempo para abandono, então o carrinho fica sempre ativo
+
+![Fluxo Get Cart](docs/images/get-cart.png)
+
+## Add Product
+> **ℹ️ Request reply** 
+> Utilizamos o Kafka como broker e camada de resiliencia e escalabilidade, porém a comunicação é sincrona por meio de 2 tópicos, um para envio e outro para resposta.
+
+![Fluxo Add Product](docs/images/add-product.png)
+
+## Remove Product
+> **ℹ️ Request reply** 
+> Utilizamos o Kafka como broker e camada de resiliencia e escalabilidade, porém a comunicação é sincrona por meio de 2 tópicos, um para envio e outro para resposta.
+![Fluxo Remove Product](docs/images/remove-product.png)
+
+# TODOs
+
+- [x] Autenticação
+- [ ] Testes
+- [ ] Cache

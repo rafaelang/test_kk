@@ -9,9 +9,10 @@ import { ConfigService } from '@nestjs/config/dist/config.service';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { HttpModule } from '@nestjs/axios/dist/http.module';
 import { HttpService } from '@nestjs/axios';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), CartModule, ProductModule],
+  imports: [ConfigModule.forRoot(), CartModule, ProductModule, AuthModule],
   controllers: [CartController, ProductController],
   providers: [CartService, ProductService],
 })

@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Body } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, UseGuards } from '@nestjs/common';
 import { CartService } from './cart.service';
 import {
   CartDto,
@@ -8,10 +8,14 @@ import {
   GetCartIdParamDto,
   GetCartUserIdParamDto,
 } from './dtos/cart-operation.dto';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BadRequestException } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
+import { AuthGuard } from '@nestjs/passport';
 
+@ApiTags('Cart Services API')
+@UseGuards(AuthGuard('jwt'))
+@ApiBearerAuth('access-token')
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
