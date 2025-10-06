@@ -26,6 +26,9 @@ export class CartProduct {
     @Column({ type: 'int' })
     quantity: number;
 
+    @Column({ type: 'int' })
+    userId: number;
+
     @ManyToOne(() => Cart, cart => cart.products)
     cart: Cart;
 }

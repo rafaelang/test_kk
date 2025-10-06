@@ -25,32 +25,34 @@ export class CartController {
         }
     }
 
-    @Post(':shoppingCartId/add-item')
+    @Post(':userId/:shoppingCartId/add-item')
     @ApiBody({ type: CartRequestOperationDto })
+    @ApiParam({ name: 'userId', required: true, description: 'ID of the user' })
     @ApiParam({ name: 'shoppingCartId', required: true, description: 'ID of the shopping cart' })
     @ApiOperation({ summary: 'Add item to shopping cart' })
     @ApiResponse({ status: 201, description: 'Item added to cart successfully.' })
     async addItem(@Param() params: GetCartIdParamDto, @Body() item: CartRequestOperationDto) {
         const payload: CartOperationDto = { operation: CartOperationType.ADD, productId: item.productId, quantity: item.quantity };
         try {
-            return await this.cartService.addItem(params.shoppingCartId, payload);
+            return await this.cartService.addItem(params.userId, params.shoppingCartId, payload);
         } catch (error) {
             if (error.exception_type === 'InvalidShoppingCartIdError') {
-                throw new BadRequestException(`ShoppingCartId is invalid: ${params.shoppingCartId}`);
+                throw new BadRequestException(`ShoppingCartId is invalid: ${error.message}`);
             }
             throw error;
         }
     }
 
-    @Post(':shoppingCartId/remove-item')
+    @Post(':userId/:shoppingCartId/remove-item')
     @ApiBody({ type: CartRequestOperationDto })
+    @ApiParam({ name: 'userId', required: true, description: 'ID of the user' })
     @ApiParam({ name: 'shoppingCartId', required: true, description: 'ID of the shopping cart' })
     @ApiOperation({ summary: 'Remove item from shopping cart' })
     @ApiResponse({ status: 200, description: 'Item removed from cart successfully.' })
     async removeItem(@Param() params: GetCartIdParamDto, @Body() item: CartRequestOperationDto) {
         const payload: CartOperationDto = { operation: CartOperationType.REMOVE, productId: item.productId, quantity: item.quantity };
         try {
-            return await this.cartService.removeItem(params.shoppingCartId, payload);
+            return await this.cartService.removeItem(params.userId, params.shoppingCartId, payload);
         } catch (error) {
             if (error.exception_type === 'InvalidShoppingCartIdError') {
                 throw new BadRequestException(`ShoppingCartId is invalid: ${error.message}`);

@@ -1,4 +1,3 @@
-import { CartProduct } from './../../../../cart-microservice/src/cart/cart.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
@@ -49,6 +48,15 @@ export class CartOperationDto {
 }
 
 export class GetCartIdParamDto {
+    @ApiProperty({
+        description: 'The unique identifier of the user.',
+        example: '5678',
+        required: true,
+    })
+    @IsInt()
+    @Type(() => Number)
+    userId: number;
+
     @ApiProperty({
         description: 'The unique identifier of the shopping cart.',
         example: '11333',

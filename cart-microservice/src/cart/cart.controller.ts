@@ -18,9 +18,9 @@ export class CartController {
     }
 
     @MessagePattern('update_cart')
-    async updateCart(@Body() data: { shoppingCartId: number; item: ProductOperationDto }) {
+    async updateCart(@Body() data: { userId: number; shoppingCartId: number; item: ProductOperationDto }) {
         try {
-            return await this.cartService.updateCart(data.shoppingCartId, data.item);
+            return await this.cartService.updateCart(data.userId, data.shoppingCartId, data.item);
         } catch (error) {
             throw new RpcException({
                 message: error.message || 'Failed to update cart',

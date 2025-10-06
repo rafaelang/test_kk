@@ -1,3 +1,4 @@
+import { validate } from './../../../front-api-gateway/node_modules/webpack/types.d';
 import { firstValueFrom } from 'rxjs';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CartDao, CartProductDao } from './daos/cart.dao';
@@ -33,6 +34,9 @@ export class CartService {
 
     async getCartByUserId(userId: number): Promise<CartDto> {
         let cart = await this.cartRepository.getOrCreateByUserId(userId);
+        if (!cart.products) {
+            cart.products = [];
+        }
         const calculatedTotal = cart.products.reduce((sum, product) => sum + product.price * product.quantity, 0);
         const totalQuantity = cart.products.reduce((sum, product) => sum + product.quantity, 0);
         const cartDto = { 
@@ -43,15 +47,16 @@ export class CartService {
         return cartDto;
     }
 
-    async getCartProduct(shoppingCartId: number, productId: number): Promise<CartProduct | null> {
-        const cartProduct = await this.cartProductRepository.get(shoppingCartId, productId);
+    async getCartProduct(userId: number, shoppingCartId: number, productId: number): Promise<CartProduct | null> {
+        const cartProduct = await this.cartProductRepository.get(userId, shoppingCartId, productId);
         return cartProduct;
     }
     
-    async addItemToCart(shoppingCartId: number, item: ProductOperationDto) {
+    async addItemToCart(userId: number, shoppingCartId: number, item: ProductOperationDto) {
         const product = await this.getProduct(item.productId);
         item.price = product.price;
         const cartProduct = await this.cartProductRepository.updateOrCreate(
+            userId,
             shoppingCartId,
             item.productId,
             item,
@@ -60,8 +65,8 @@ export class CartService {
         return { shoppingCartId, itemAdded: cartProduct };
     }
 
-    async removeItemFromCart(shoppingCartId: number, item: ProductOperationDto) {
-        const cartProduct = await this.getCartProduct(shoppingCartId, item.productId);
+    async removeItemFromCart(userId: number, shoppingCartId: number, item: ProductOperationDto) {
+        const cartProduct = await this.getCartProduct(userId, shoppingCartId, item.productId);
         let new_quantity = 0;
 
         if (!cartProduct) {
@@ -81,11 +86,24 @@ export class CartService {
         return { shoppingCartId, itemRemoved: item.productId, currentQuantity: new_quantity };
     }
 
-    async updateCart(shoppingCartId: number, item: ProductOperationDto) {
+    async validateCartOwnership(userId: number, shoppingCartId: number) {
+        const cart = await this.getCartById(shoppingCartId);
+        if (!cart || cart.userId !== userId) {
+            this.logger.warn(`UserId ${userId} attempted to access ShoppingCartId ${shoppingCartId} which they do not own.`);
+            const error = new Error(`ShoppingCartId ${shoppingCartId} does not belong to UserId ${userId} or cart not found.`);
+            error.name = "InvalidShoppingCartIdError";
+            throw error;
+        }
+        return true;
+    }
+
+    async updateCart(userId: number, shoppingCartId: number, item: ProductOperationDto) {
+        await this.validateCartOwnership(userId, shoppingCartId);
+
         if (item.operation === 'REMOVE') {
-            return this.removeItemFromCart(shoppingCartId, item);
+            return this.removeItemFromCart(userId, shoppingCartId, item);
         } else if (item.operation === 'ADD') {
-            return this.addItemToCart(shoppingCartId, item);
+            return this.addItemToCart(userId, shoppingCartId, item);
         }
 
         this.logger.log(`Updating cart ${shoppingCartId} with item`, item);

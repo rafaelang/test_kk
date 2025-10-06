@@ -42,8 +42,8 @@ export class CartProductDao {
         private readonly cartRepository: Repository<Cart>,
     ) {}
 
-    async get(shoppingCartId: number, productId: number): Promise<CartProduct | null> {
-        let cart_product = await this.repository.findOneBy({ productId: productId, cart: { shoppingCartId: shoppingCartId } });
+    async get(userId: number, shoppingCartId: number, productId: number): Promise<CartProduct | null> {
+        let cart_product = await this.repository.findOneBy({ productId: productId, cart: { shoppingCartId: shoppingCartId, userId: userId } });
         return cart_product;
     }
 
@@ -72,12 +72,13 @@ export class CartProductDao {
     }
 
     async updateOrCreate(
+        userId: number,
         cartId: number,
         productId: number,
         item: ProductDto,
         fn_assign: (target: CartProduct, source: ProductDto) => void = Object.assign
     ): Promise<CartProduct> {
-        let [created, cart_product] = await this.getOrCreate(cartId, productId, item, false);
+        let [created, cart_product] = await this.getOrCreate(userId, cartId, productId, item, false);
 
         if (!created) {
             fn_assign(cart_product, item);
@@ -90,12 +91,13 @@ export class CartProductDao {
     }
 
     async getOrCreate(
+        userId: number,
         shoppingCartId: number,
         productId: number,
         item: ProductDto,
         persist: boolean = true
     ): Promise<[boolean, CartProduct]> {
-        let cart_product = await this.repository.findOneBy({ productId: productId, cart: { shoppingCartId: shoppingCartId } });
+        let cart_product = await this.repository.findOneBy({ productId: productId, cart: { userId: userId, shoppingCartId: shoppingCartId } });
         let created = false;
 
         if (!cart_product) {
@@ -103,6 +105,7 @@ export class CartProductDao {
             created = true;
         }
 
+        cart_product.userId = userId;
         cart_product.productId = productId;
 
         if (persist) {
