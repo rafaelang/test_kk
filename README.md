@@ -63,6 +63,16 @@ O projeto adota o padrão de Data Transfer Objects (DTOs) para definir e validar
 
 # Desenvolvimento
 
+## Containers para desenvolvimento
+
+Antes de iniciar os projetos inicie todos os containers.
+
+```sh
+git clone git@github.com:rafaelang/<repo>.git
+cd desenvolvimento_containers
+docker compose up
+```
+
 ## Project Cart Microservice
 
 
@@ -81,6 +91,7 @@ CART_API_PORT=3002
 KAFKA_BROKERS=localhost:9094
 KAFKA_GROUP_ID=cart-service-group
 PRODUCT_API_URL=http://localhost:3001" > .env
+npm run migration:run
 npm run start:dev
 ```
 
@@ -94,5 +105,22 @@ nvm use
 npm install
 echo "MONGODB_URI=mongodb://mongouser:mongopass@localhost:27017/product_microservice?authSource=admin
 PRODUCT_API_PORT=3001" > .env
+npm run start:dev
+```
+
+## Project Front API Gateway
+
+```sh
+git clone git@github.com:rafaelang/<repo>.git
+cd <project>
+cd product-microservice
+nvm use
+npm install
+echo "FRONT_API_PORT=3000
+PRODUCT_API_URL=http://localhost:3001
+CART_API_URL=http://localhost:3002
+CART_KAFKA_BROKERS=localhost:9094
+CART_BROKER_CONSUMER_GROUP=apigatewaycart-service-group
+CART_BROKER_CLIENT_ID=apigateway-cart-service" > .env
 npm run start:dev
 ```
