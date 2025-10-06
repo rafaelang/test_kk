@@ -105,6 +105,19 @@ A primeir inicialização os tópicos são criados, basta reiniciar a aplicaçã
 
 # Setup
 
+## Containers de desenvolvimento
+```sh
+git clone git@github.com:rafaelang/<repo>.git
+cd <project>
+cd development_containers
+cd docker compose up 
+```
+
+#### Clean up containers
+```sh
+docker compose down -v
+```
+
 ## Project Cart Microservice
 
 ```sh
