@@ -23,7 +23,7 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+O **cart-microservice** é um serviço independente desenvolvido com NestJS e TypeScript, projetado para gerenciar operações de carrinho de compras em plataformas de e-commerce. Ele fornece APIs para adicionar, atualizar e remover itens do carrinho de um usuário, calcular totais e lidar com a persistência do carrinho. Este microsserviço foi criado para ser escalável, de fácil manutenção e facilmente integrável com outros serviços em uma arquitetura de sistemas distribuídos.
 
 ## Project setup
 

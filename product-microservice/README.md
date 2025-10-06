@@ -23,7 +23,7 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Product Microservice é um serviço desenvolvido com NestJS para gerenciar produtos de forma eficiente e escalável. Ele oferece endpoints para recuperar produtos, integrando-se facilmente a outros microsserviços do ecossistema. O projeto utiliza TypeScript, segue boas práticas de arquitetura.
 
 ## Project setup
 

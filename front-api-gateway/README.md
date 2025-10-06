@@ -23,7 +23,7 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Front API Gateway é um projeto desenvolvido com NestJS que atua como camada intermediária entre o frontend e múltiplos serviços backend. Ele centraliza o gerenciamento de rotas, autenticação, autorização e orquestração de chamadas, facilitando a integração e a escalabilidade da aplicação. O objetivo principal é simplificar o consumo de APIs, garantir segurança e padronizar a comunicação entre o frontend e os microserviços, proporcionando uma arquitetura mais organizada e eficiente.
 
 ## Project setup
 
